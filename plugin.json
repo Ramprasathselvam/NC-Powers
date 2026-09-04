@@ -1,0 +1,24 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "nc-powers",
+  "version": "0.1.0",
+  "description": "Reusable Kiro Power and Agent Skills for Jira-driven Figma-to-iOS development workflows.",
+  "author": {
+    "name": "Ramprasathselvam"
+  },
+  "keywords": [
+    "kiro",
+    "power",
+    "agent-skills",
+    "jira",
+    "figma",
+    "ios",
+    "swift",
+    "swiftui",
+    "uikit",
+    "testing",
+    "code-review"
+  ],
+  "license": "MIT",
+  "repository": "https://github.com/Ramprasathselvam/NC-Powers"
+}
