@@ -59,7 +59,8 @@ NC-Powers/
 │   └── workflow.md
 ├── mcp/
 │   ├── jira.example.json
-│   └── figma.example.json
+│   ├── figma.example.json
+│   └── github.example.json
 ├── docs/
 │   ├── architecture.md
 │   ├── installation.md
@@ -116,7 +117,11 @@ The Skills are deliberately backed by the Steering in this repository. They shou
 
 ## MCP and secrets
 
-`mcp/*.example.json` files are configuration examples only. Never commit Jira/Figma credentials, API tokens, passwords, certificates, `.env` files, or other secrets. Configure authentication through the team's approved Kiro/MCP environment.
+The `mcp/*.example.json` files are configuration examples for Jira, Figma, and GitHub integrations. Never commit Jira/Figma/GitHub credentials, API tokens, passwords, certificates, `.env` files, or other secrets. Configure authentication through the team's approved Kiro/MCP environment.
+
+### GitHub MCP
+
+`mcp/github.example.json` provides a GitHub MCP Server example for repository, branch, pull request, review, and related GitHub operations. The GitHub token must be supplied only through the local/team-approved environment and must never be committed to this repository.
 
 ## Documentation
 
@@ -127,4 +132,4 @@ The Skills are deliberately backed by the Steering in this repository. They shou
 
 ## Contribution
 
-Treat changes to `POWER.md`, Skills, and Steering as team-level changes. Validate affected workflows and approval gates before adoption because a change can affect every developer using `NC-Powers`.
+Treat changes to `POWER.md`, Skills, Steering, and MCP integration examples as team-level changes. Validate affected workflows and approval gates before adoption because a change can affect every developer using `NC-Powers`.
