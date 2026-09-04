@@ -1,18 +1,37 @@
 # NC-Powers
 
-Reusable Kiro Powers and Agent Skills for iOS development workflows.
+**NissanConnect Kiro Power for Jira-driven iOS development.**
 
-## Purpose
+`NC-Powers` is a team-managed Kiro Power repository created specifically for the NissanConnect iOS codebase. It centralizes the project's workflow, Skills, Steering knowledge, and integration templates so the team can maintain and evolve them in one place.
 
-`NC-Powers` is the shared, team-level repository for reusable Kiro workflow assets. It is intentionally separated from individual iOS application repositories so the workflow can be versioned, reviewed, and maintained centrally.
-
-The repository is designed to support a controlled development lifecycle such as:
+## Development lifecycle
 
 ```text
-Jira → Figma → iOS Implementation → Test Cases → Validation → PR → Review → Done
+Jira → Figma → Architecture → Implement → Test Cases
+                                      ↓
+                                   Validate
+                                      ↓
+                                  Create PR
+                                      ↓
+                                  Review PR
+                                      ↓
+                                  Complete
 ```
 
-## Repository Structure
+Each stage is intentionally separated. A command does not automatically trigger the next command.
+
+## Commands
+
+| Command | Responsibility | Writes |
+|---|---|---|
+| `Start <XR-KEY>` | Read Jira requirements | No |
+| `Implement <XR-KEY>` | Discover, plan, implement source and tests, record evidence | Code/test + gated Jira |
+| `Validate <XR-KEY>` | Run quality and acceptance checks | No source/git/Jira |
+| `Create PR for <XR-KEY>` | Branch, commit, push and create PR | Git/GitHub, all gated |
+| `Review PR for <XR-KEY>` | Review the actual PR diff | No by default; GitHub posting gated |
+| `Complete <XR-KEY>` | Complete Jira after PR completion | Jira, gated |
+
+## Repository structure
 
 ```text
 NC-Powers/
@@ -21,10 +40,23 @@ NC-Powers/
 ├── skills/
 │   ├── jira-to-ios/
 │   ├── figma-to-ios/
-│   ├── implementation-workflow/
-│   ├── testcase-generation-validation/
-│   ├── validation/
-│   └── code-review/
+│   ├── ios-architecture/
+│   ├── implement/
+│   ├── validate/
+│   ├── pr-create/
+│   ├── code-review/
+│   └── jira-complete/
+├── steering/
+│   ├── product.md
+│   ├── architecture.md
+│   ├── structure.md
+│   ├── design-system.md
+│   ├── swift.md
+│   ├── swiftui.md
+│   ├── uikit.md
+│   ├── testing.md
+│   ├── tech.md
+│   └── workflow.md
 ├── mcp/
 │   ├── jira.example.json
 │   └── figma.example.json
@@ -38,48 +70,61 @@ NC-Powers/
 └── LICENSE
 ```
 
-> `POWER.md`, Steering files, and Skills generated/validated in Kiro should be added without changing their project-specific content unless the Power maintainer intentionally updates the reusable behavior.
+## Why Steering is here
 
-## Design Principles
+Unlike a generic iOS Skill library, this repository is intentionally project-specific. The `steering/` files capture NissanConnect knowledge that the Skills need in order to make correct decisions, including:
 
-### Reusable
+- VIPER-style MVP architecture and module-factory patterns
+- AdapterCenter and networking conventions
+- Nissan/Infiniti brand and region behavior
+- Swift, SwiftUI, and UIKit conventions
+- Design-system tokens and localization
+- Test conventions and mock naming
+- Git, PR, Jira, and region-switch rules
 
-Power and Skills should work across multiple iOS repositories and should not depend on application-specific class names, paths, or implementation details.
+Keeping this knowledge beside the Power makes the repository a single source of truth for the current team workflow.
 
-### Project-specific knowledge stays with the project
+If a future team wants a generic iOS Power, the reusable Skills can be extracted and the project-specific Steering can remain separate.
 
-Each iOS application should keep its own `.kiro/steering/` configuration for architecture, folder structure, coding conventions, design system, testing conventions, and other repository-specific rules.
+## Approval and safety model
 
-### Explicit approval for external or destructive actions
-
-The workflow should require explicit user approval before actions such as Jira status transitions, pushing branches, creating pull requests, posting external review comments, or completing Jira issues when the workflow requires it.
-
-### Evidence-based execution
-
-Never claim that a build, test, screenshot, validation step, Jira update, or PR action succeeded unless it was actually performed and verified.
-
-### Small, focused Skills
-
-Each Skill should have one clear responsibility. The Power should orchestrate Skills rather than duplicate their detailed procedures.
-
-## Example project integration
-
-A consuming iOS project can keep project-specific configuration under:
+External or destructive actions require explicit approval at the point of action. Approval is never inferred or reused for another action.
 
 ```text
-.kiro/
-├── steering/
-└── skills/
+Jira To Do → In Progress     → ask first
+Source/test file write       → ask first
+Branch creation              → ask first
+Commit                       → ask first
+Push / PR creation           → ask immediately before
+GitHub review/comment        → ask immediately before
+In Review → Done             → ask immediately before
 ```
 
-The reusable Power from this repository supplies shared workflow behavior, while project steering supplies application-specific context.
+The workflow must never silently:
 
-## MCP and Secrets
+- move Jira statuses
+- push to protected branches
+- create a PR
+- post GitHub review comments
+- merge a PR
+- mark a Jira ticket Done
+- fabricate test, build, screenshot, lint, Jira, or PR evidence
 
-MCP files in this repository are examples/templates only. Do not commit access tokens, passwords, API keys, or other secrets. Authentication should be configured in the team's Kiro/MCP environment according to organizational security policies.
+## Project-specific rules
+
+The Skills are deliberately backed by the Steering in this repository. They should not guess application architecture, design tokens, networking stacks, target configuration, or brand/region behavior. When repository evidence is insufficient, the workflow should stop and surface the gap.
+
+## MCP and secrets
+
+`mcp/*.example.json` files are configuration examples only. Never commit Jira/Figma credentials, API tokens, passwords, certificates, `.env` files, or other secrets. Configure authentication through the team's approved Kiro/MCP environment.
+
+## Documentation
+
+- [Architecture](docs/architecture.md)
+- [Workflow](docs/workflow.md)
+- [Installation](docs/installation.md)
+- [Contribution guide](docs/contribution.md)
 
 ## Contribution
 
-Changes to shared Skills and Power behavior should be reviewed carefully because they can affect multiple consuming projects.
-
-See [`docs/contribution.md`](docs/contribution.md) for the recommended contribution process.
+Treat changes to `POWER.md`, Skills, and Steering as team-level changes. Validate affected workflows and approval gates before adoption because a change can affect every developer using `NC-Powers`.
