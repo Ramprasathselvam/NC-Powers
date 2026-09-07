@@ -1,9 +1,19 @@
 ---
 name: ios-architecture
-description: Discover where a change belongs and how surrounding code works (VIPER module, factory, AdapterCenter, networking stack, navigation) before implementing. Read-only.
-activation: "Where does <X> live", "how does <feature> work", "find the module for <X>", "which networking stack for <X>"
-tools: [filesystem-read, filesystem-search, context-gatherer]
-gates: none
+description: >-
+  Discover where a change belongs and how surrounding code works (VIPER module,
+  factory, AdapterCenter, networking stack, navigation) before implementing.
+  Read-only.
+activation:
+  - "Where does <X> live"
+  - "how does <feature> work"
+  - "find the module for <X>"
+  - "which networking stack for <X>"
+tools:
+  - filesystem-read
+  - filesystem-search
+  - context-gatherer
+gates: []
 ---
 
 # ios-architecture
