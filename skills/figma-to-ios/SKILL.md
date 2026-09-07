@@ -1,9 +1,16 @@
 ---
 name: figma-to-ios
-description: Map a Figma design linked on a ticket to existing app design tokens/components, flagging gaps. Read-only. Does not generate final UI code.
-activation: "Pull the Figma for <XR-KEY>", "map this design to our components", "what tokens does this screen use"
-tools: [figma-mcp-read, filesystem-read]
-gates: none
+description: >-
+  Map a Figma design linked on a ticket to existing app design tokens/components,
+  flagging gaps. Read-only. Does not generate final UI code.
+activation:
+  - "Pull the Figma for <XR-KEY>"
+  - "map this design to our components"
+  - "what tokens does this screen use"
+tools:
+  - figma-mcp-read
+  - filesystem-read
+gates: []
 ---
 
 # figma-to-ios
