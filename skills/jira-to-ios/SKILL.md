@@ -1,9 +1,17 @@
 ---
 name: jira-to-ios
-description: Turn an XR Jira ticket into a structured, iOS-oriented requirements brief before any code is written. Read-only.
-activation: "Start <XR-KEY>", "requirements for <XR-KEY>", "summarize <XR-KEY>", "what does <XR-KEY> need"
-tools: [jira-mcp-read, filesystem-read]
-gates: none
+description: >-
+  Turn an XR Jira ticket into a structured, iOS-oriented requirements brief
+  before any code is written. Read-only.
+activation:
+  - "Start <XR-KEY>"
+  - "requirements for <XR-KEY>"
+  - "summarize <XR-KEY>"
+  - "what does <XR-KEY> need"
+tools:
+  - jira-mcp-read
+  - filesystem-read
+gates: []
 ---
 
 # jira-to-ios
@@ -70,8 +78,8 @@ ios-architecture.
 - Ticket not found / no access → report and stop.
 - No acceptance criteria → list Open Questions rather than proceeding.
 - Jira MCP unavailable → report; ask the user to paste ticket details.
-- UI ticket has no Figma link → report the missing design input and ask whether
-  to continue without Figma.
+- UI ticket has no Figma link → report the missing design input and ask whether to
+  continue without Figma.
 
 ## Required tools/MCP
 Jira (Atlassian) MCP — read scope only. Filesystem read (to relate to code).
