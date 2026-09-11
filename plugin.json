@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "nc-powers",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Reusable Kiro Power and Agent Skills for Jira-driven Figma-to-iOS development workflows.",
   "author": {
     "name": "Ramprasathselvam"
