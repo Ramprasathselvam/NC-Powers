@@ -1,22 +1,27 @@
 {
-  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
   "mcpServers": {
+    "jira": {
+      "url": "https://mcp.atlassian.com/v1/mcp/authv2",
+      "oauth": {},
+      "disabled": false
+    },
     "github": {
-      "type": "stdio",
-      "command": "docker",
+      "command": "/opt/homebrew/bin/github-mcp-server",
       "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e",
-        "GITHUB_PERSONAL_ACCESS_TOKEN",
-        "-e",
-        "GITHUB_TOOLSETS",
-        "ghcr.io/github/github-mcp-server"
+        "stdio"
       ],
       "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}",
-        "GITHUB_TOOLSETS": "repos,pull_requests,actions"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "----Your token---"
+      },
+      "disabled": false,
+      "autoApprove": []
+    }
+  },
+  "powers": {
+    "mcpServers": {
+      "power-figma-figma": {
+        "type": "http",
+        "url": "https://mcp.figma.com/mcp"
       }
     }
   }
