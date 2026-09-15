@@ -2,11 +2,11 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
   "mcpServers": {
     "jira": {
-      "url": "https://mcp.atlassian.com/v1/mcp/authv2",
-      "oauth": {},
-      "disabled": false
+      "type": "streamable-http",
+      "url": "https://mcp.atlassian.com/v1/mcp/authv2"
     },
     "github": {
+      "type": "stdio",
       "command": "github-mcp-server",
       "args": ["stdio"],
       "env": {
@@ -15,8 +15,8 @@
       "disabled": false,
       "autoApprove": []
     },
-    "power-figma-figma": {
-      "type": "http",
+    "figma": {
+      "type": "streamable-http",
       "url": "https://mcp.figma.com/mcp"
     }
   }
