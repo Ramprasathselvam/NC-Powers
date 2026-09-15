@@ -6,12 +6,14 @@
       "url": "https://mcp.atlassian.com/v1/mcp/authv2"
     },
     "github": {
-      "type": "stdio",
-      "command": "github-mcp-server",
+      "command": "/opt/homebrew/bin/github-mcp-server",
       "args": [
         "stdio"
       ],
-      "disabled": false,
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "---place-yout-token---"
+      },
+      "disabled": true,
       "autoApprove": []
     },
     "figma": {
