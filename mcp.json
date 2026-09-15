@@ -7,7 +7,7 @@
       "disabled": false
     },
     "github": {
-      "command": "/opt/homebrew/bin/github-mcp-server",
+      "command": "github-mcp-server",
       "args": ["stdio"],
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
