@@ -5,17 +5,6 @@
       "type": "streamable-http",
       "url": "https://mcp.atlassian.com/v1/mcp/authv2"
     },
-    "github": {
-      "command": "/opt/homebrew/bin/github-mcp-server",
-      "args": [
-        "stdio"
-      ],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "---place-yout-token---"
-      },
-      "disabled": true,
-      "autoApprove": []
-    },
     "figma": {
       "type": "streamable-http",
       "url": "https://mcp.figma.com/mcp"
