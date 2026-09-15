@@ -1,5 +1,4 @@
 {
-"$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
   "mcpServers": {
     "jira": {
       "url": "https://mcp.atlassian.com/v1/mcp/authv2",
@@ -7,12 +6,10 @@
       "disabled": false
     },
     "github": {
-      "command": "/opt/homebrew/bin/github-mcp-server",
-      "args": [
-        "stdio"
-      ],
+      "command": "github-mcp-server",
+      "args": ["stdio"],
       "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "----Your token---"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
       },
       "disabled": false,
       "autoApprove": []
