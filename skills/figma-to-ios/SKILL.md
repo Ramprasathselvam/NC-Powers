@@ -3,7 +3,8 @@ name: figma-to-ios
 description: >-
   Analyze a Figma design linked on a ticket and map its structure, variables,
   visual properties, assets, and components to the OneId_EVO (NC/NCI) iOS design
-  system. Read-only. Does not generate or modify final UI code or Figma designs.
+  system. Apply applicable Apple iOS design guidance during the analysis. Read-only.
+  Does not generate or modify final UI code or Figma designs.
 activation:
   - "Pull the Figma for <XR-KEY>"
   - "map this design to our components"
@@ -19,15 +20,77 @@ gates: []
 # figma-to-ios
 
 ## Purpose
-Translate Figma design intent into concrete implementation guidance for the
-OneId_EVO (NC/NCI) iOS codebase. Use the Figma MCP server as the source for
-design structure and visual details, then map those details to the existing
-NCI design tokens, components, typography, localization, and platform
-conventions defined in this repository.
+Translate Figma design intent into concrete, production-ready iOS implementation
+guidance for the OneId_EVO (NC/NCI) codebase. Use the Figma MCP server as the
+source for design structure and visual details, then map those details to the
+existing NCI design tokens, components, typography, localization, accessibility,
+and platform conventions defined in this repository.
+
+The resulting guidance must also consider applicable Apple Human Interface
+Guidelines and applicable App Review design requirements while the UI is being
+analyzed and planned. Do not treat Apple guidance as a separate post-generation
+check.
 
 This skill is a **read-only analysis/mapping stage**. It prepares reliable input
 for the implementation skill; it does not write Swift/SwiftUI/UIKit code and does
 not modify Figma.
+
+## Design authority and evidence priority
+Use these sources in this order when determining the iOS implementation:
+
+1. Existing NC/NCI implementation and design-system conventions
+2. Applicable Apple iOS platform guidance and Human Interface Guidelines
+3. Figma Code Connect mappings/snippets, when available
+4. Figma component and variant definitions
+5. Figma variables and styles
+6. Raw Figma visual properties
+
+Figma represents the intended product design, but it must be translated into an
+iOS experience that is compatible with the project's design system and applicable
+Apple platform requirements.
+
+If Figma intentionally deviates from an Apple convention, do not silently change
+the design. Identify the deviation, explain the relevant consideration, and pass
+it to the implementation stage as a Gap/decision requiring human or product input.
+
+## Apple iOS design requirements
+All iOS UI implementation guidance produced by this skill must follow applicable
+Apple platform design guidance.
+
+Primary references:
+- Apple Human Interface Guidelines:
+  https://developer.apple.com/design/human-interface-guidelines
+- Apple App Review Guidelines (use the applicable Design requirements):
+  https://developer.apple.com/app-store/review/guidelines/#design
+
+Apply the relevant guidance during Figma analysis and implementation planning,
+especially for:
+- iOS navigation and interaction patterns
+- System components and familiar controls
+- Layout, safe areas, and adaptive behavior
+- Typography and Dynamic Type
+- Accessibility and readable content
+- Touch targets and interaction behavior
+- Color, contrast, and non-color state communication
+- Dark Mode / appearance changes
+- Localization and text expansion
+- Different iPhone/iPad screen sizes when applicable
+- Orientation and responsive/constraint behavior
+- System gestures
+- Alerts, sheets, menus, and other modal patterns
+- SF Symbols and platform resources when appropriate
+- Loading, empty, error, disabled, and selected states
+- Consistent terminology and platform conventions
+
+Do not attempt to apply the entire App Review Guidelines to a visual design.
+Only consider App Review requirements that are relevant to UI/design or the
+specific feature being analyzed. Other App Review areas such as privacy,
+payments, legal, business, safety, and technical requirements belong to the
+appropriate implementation/validation stages.
+
+If an applicable Apple requirement conflicts with the Figma design, report the
+specific conflict and recommended implementation consideration rather than
+silently reproducing the Figma design.
 
 ## Project design-system facts (NC / NCI)
 This is the Nissan / Infiniti connected-car app. The design system is centralized
@@ -40,30 +103,20 @@ symbols; never invent new ones.
   `Localized.swift`). Config: `NC/swiftgen.yml`. These are generated — read them
   to discover valid tokens; do not hand-edit them here.
 - **Colors:** `Asset.<name>.color` (UIKit) / `Color(.<name>)` (SwiftUI), from
-  `Assets.swift`. Names are `nc`-prefixed or emphasis/percent based, e.g.
-  `Asset.ncBlue.color`, `Asset.ncButtonBackground.color`, `Color(.ncTitleBlack)`,
-  `Color(.ncTitleBlack54)`, `Asset.hightEmphasis.color`, `Asset._50Percent.color`.
+  `Assets.swift`. Examples: `Asset.ncBlue.color`, `Asset.ncButtonBackground.color`,
+  `Color(.ncTitleBlack)`, `Color(.ncTitleBlack54)`, `Asset.hightEmphasis.color`,
+  `Asset._50Percent.color`.
 - **Fonts (UIKit):** `UIFont.<brandWeight>Font(ofSize:)` from
   `NC/NCI/Extensions/UIFonts+NCI.swift`, backed by `FontFamily` in `Fonts.swift`.
-  Available helpers: `nissanRegularFont`, `nissanBoldFont`, `nissanLightFont`,
-  `nissanItalicFont`, `infinitiRegularFont`, `infinitiBoldFont`,
-  `infinitiLightFont`, `sfpdisplayRegularFont`, `sfpdisplayBoldFont`,
-  `sfpdisplayLightFont`, `sfptextLightFont`, `sfptextRegularFont`,
-  `sfptextMediumFont`, `sfptextBoldFont`, `sfptextSemiBoldFont`.
-  `FontFamily` enums: `NissanBrand`, `NissanBrandW01Bold`, `NissanBrandW01Light`,
-  `InfinitiBrand`, `SFProDisplay`, `SFProText`.
-- **Typography (SwiftUI):** the semantic `TextStyle` enum and `AppText` primitive
-  in `NC/NCI/Commons/Component/SwiftUIComponents/TextStyles.swift`. SwiftUI text
-  should map to an `AppText(_, style:)` case (`.header1`…`.header6`,
-  `.header1Large`, `.nissanTitleMedium`, `.nissanBodyMedium`, `.caption`) rather
-  than raw `.system(size:weight:)` / `.custom(_:size:)`. Reusable `SwiftUI.Font`
-  values also live here (e.g. `.systemRegular16`, `.nissanRegular16`).
+  Available helpers include Nissan, Infiniti, SF Pro Display, and SF Pro Text
+  regular/bold/light/medium/semi-bold variants.
+- **Typography (SwiftUI):** semantic `TextStyle` and `AppText` in
+  `NC/NCI/Commons/Component/SwiftUIComponents/TextStyles.swift`. Prefer
+  `AppText(_, style:)` cases (`.header1`…`.header6`, `.header1Large`,
+  `.nissanTitleMedium`, `.nissanBodyMedium`, `.caption`) over raw system/custom
+  fonts. Shared Font statics may be used only when a semantic style does not fit.
 - **Localization:** `L10n.<Table>.<key>` from `Localized.swift`. Source tables
-  live in `NC/NCI/Resources/Localization/en.lproj/*.strings`. Known tables:
-  `Account`, `AddVehicle`, `Assistance`, `Battery`, `Brand`, `ChargingHistory`,
-  `Dashboard`, `HealthStatus`, `History`, `Hvac` (from `HVAC.strings`),
-  `JourneyDiary`, `Localizable`, `Navigation`, `NissanStore`, `Notification`,
-  `Onboarding`, `Profile`, `Program`, `Restriction`, `VehicleRecovery`.
+  live in `NC/NCI/Resources/Localization/en.lproj/*.strings`.
 - **Shared SwiftUI components:** `NC/NCI/Commons/Component/SwiftUIComponents/`
   (`AppText`, `AppAlertView`, `AppLoader`, `BulletText`,
   `CircularProgressIndicator`, `InfoStateView`, `NavigationRouter`).
@@ -73,8 +126,7 @@ symbols; never invent new ones.
   `NCCharts`, `NCErrorView`, `ShimmerView`, `BannerMessageView`).
 - **Platform boundaries:** the watch app (`NC/NCIWatch Watch App`), widgets
   (`NC/NCIWidget`, `NC/NCWidget`), and intents do NOT reference the app-layer
-  `Asset` / `FontFamily` / `TextStyle`. Verified: those tokens are app-target
-  only. Do not assume they exist in watch/widget/intent targets.
+  `Asset` / `FontFamily` / `TextStyle`. Check target-local tokens/assets instead.
 
 ## Source of Figma URL
 For ticket-driven work, Jira is the source of truth for the Figma link. Read the
@@ -95,16 +147,6 @@ Extract:
 - `fileKey` → the path segment immediately after `/design/`
 - `nodeId` → the `node-id` query parameter, for example `1-2`
 
-For example:
-
-```text
-https://figma.com/design/kL9xQn2VwM8pYrTb4ZcHjF/DesignSystem?node-id=42-15
-```
-
-maps to:
-- `fileKey = kL9xQn2VwM8pYrTb4ZcHjF`
-- `nodeId = 42-15`
-
 When using a Figma desktop MCP connection, the currently open Figma file may be
 used by the MCP server, so the file key may not be required. Continue to use the
 exact selected node ID when available.
@@ -120,7 +162,7 @@ Follow this sequence unless a step is genuinely unnecessary for the requested
 analysis.
 
 ### 1. Resolve the exact target node
-1. Read the Figma URL from Jira or the supplied developer context.
+1. Read the Figma URL from Jira or supplied developer context.
 2. Extract `fileKey` and `nodeId`.
 3. Prefer the exact frame/component node over broad file exploration.
 4. Do not analyze a visually similar node when the ticket provides a specific node.
@@ -129,8 +171,8 @@ analysis.
 Use Figma MCP `get_design_context` for the target node.
 
 This is the primary Figma MCP read operation and should be used before mapping
-implementation details. Treat its returned code/structure as a **representation
-of the design**, not as code to copy into the iOS project.
+implementation details. Treat returned code/structure as a **representation of
+the design**, not as code to copy into the iOS project.
 
 Use the returned context to identify:
 - Layout hierarchy
@@ -151,107 +193,96 @@ When `get_design_context` is too large, incomplete, or difficult to reason about
 3. Call `get_design_context` again for those child node IDs.
 4. Repeat only for the required branches of the hierarchy.
 
-Do not substitute `get_metadata` for design context when actual styling or component
+Do not substitute `get_metadata` for design context when styling or component
 properties are required; metadata is primarily for structure and node discovery.
 
 ### 4. Capture a visual reference
-Use Figma MCP `get_screenshot` for the target node when visual comparison is useful
-or when the design context does not fully communicate visual relationships.
+Use Figma MCP `get_screenshot` when visual comparison is useful or when the design
+context does not fully communicate visual relationships.
 
 Use the screenshot to validate:
-- Overall hierarchy
-- Alignment
-- Relative spacing
-- Visual grouping
+- Overall hierarchy and alignment
+- Relative spacing and visual grouping
 - Image/icon placement
 - Component variants
 - Empty/disabled/selected states visible in the frame
 
-Treat the screenshot as the visual reference, while using structured Figma context
-for exact inspectable properties.
+Use structured Figma context for exact inspectable properties; use the screenshot
+as visual reference/validation.
 
 ### 5. Inspect Figma variables and styles
 Use Figma MCP `get_variable_defs` when variable/style information is needed.
 
-Use it to identify:
-- Color variables
-- Typography styles
-- Spacing variables
-- Other reusable Figma design tokens
-
-Do not blindly copy Figma variable names into the iOS project. Map them to the
-existing NCI tokens (SwiftGen `Asset`, `FontFamily`, `TextStyle`, `L10n`) after
-checking the repository.
+Use it to identify color variables, typography styles, spacing variables, and other
+reusable Figma design tokens. Do not blindly copy Figma variable names into the
+iOS project. Map them to existing NCI tokens after checking the repository.
 
 ### 6. Check Code Connect information when available
 When the Figma MCP connection exposes Code Connect data, use:
 - `get_code_connect_map` to find existing Figma → code mappings.
-- `get_code_connect_suggestions` when a component has no known mapping and a
-  code-level equivalent may exist.
+- `get_code_connect_suggestions` when a component has no known mapping.
+- `get_context_for_code_connect` when additional Code Connect context is needed.
 
-Treat Code Connect as a strong signal for component identity, but still verify the
-actual Swift/SwiftUI/UIKit implementation in `NC/NCI` before reporting a match.
+Treat Code Connect as a strong signal for component identity, but verify the actual
+Swift/SwiftUI/UIKit implementation in `NC/NCI` before reporting a match.
 
 This skill does not create or send new Code Connect mappings. Mapping changes are
 outside this skill's read-only scope.
 
-### 7. Inspect assets without inventing replacements
+### 7. Use design-system discovery only when necessary
+If the component identity remains unclear after inspecting design context, Code
+Connect, and the NC/NCI repository, use the Figma MCP design-system discovery
+capabilities when available:
+- `search_design_system` for targeted component/design-system discovery.
+- `get_libraries` when library context is needed before searching.
+
+Do not make these calls mandatory for every screen. Prefer existing NC/NCI code
+and verified Figma context first.
+
+### 8. Inspect assets without inventing replacements
 When the Figma MCP response contains image, SVG, or icon asset references:
 - Record the asset and its intended usage.
-- Prefer the existing app asset/component (SwiftGen `Asset.<name>.image` from the
-  NCI asset catalogs) when the repository already has the equivalent.
+- Prefer an existing NCI asset/component (`Asset.<name>.image`) when equivalent.
 - Do not invent a replacement icon or package.
 - Do not add a new icon library merely because Figma returned an icon asset.
 - If the asset cannot be mapped to an existing app asset, list it as a Gap.
 
-If the MCP server provides a `localhost` asset URL, treat it as an MCP-served asset
-source. Do not silently rewrite it into an unrelated external URL.
+If MCP provides a `localhost` asset URL, treat it as an MCP-served asset source;
+do not silently rewrite it into an unrelated external URL.
 
 ## Map Figma to the existing iOS project
 After collecting Figma information, inspect the repository and map each relevant
-design decision to the existing implementation patterns.
+design decision to existing implementation patterns.
 
 ### Colors
 Resolve colors to existing SwiftGen tokens in
-`NC/NCI/Commons/SwiftGen/Assets.swift`:
-- UIKit: `Asset.<name>.color`, e.g. `Asset.ncBlue.color`,
-  `Asset.ncButtonBackground.color`, `Asset.hightEmphasis.color`.
-- SwiftUI: `Color(.<name>)`, e.g. `Color(.ncTitleBlack)`, `Color(.ncTitleBlack54)`.
-- Emphasis/opacity tokens exist (`hightEmphasis`, `highMediumEmphasis`,
-  `mediumEmphasis`, `lowEmphasis`, `_10Percent`…`_100Percent`) — prefer these for
-  translucent/overlay values instead of raw alpha.
+`NC/NCI/Commons/SwiftGen/Assets.swift`.
+- UIKit: `Asset.<name>.color`.
+- SwiftUI: `Color(.<name>)`.
+- Prefer existing emphasis/opacity tokens over raw alpha values.
 
 Never create a new color token only because Figma contains a different raw value.
-If an exact or acceptable project token cannot be found, record the mismatch as a Gap.
+If no acceptable project token exists, record the mismatch as a Gap.
 
 ### Typography
-Map Figma typography to the existing definitions:
-- **UIKit:** `UIFont.<brandWeight>Font(ofSize:)` from
-  `NC/NCI/Extensions/UIFonts+NCI.swift` (e.g. `UIFont.sfptextMediumFont(ofSize:)`,
-  `UIFont.nissanBoldFont(ofSize:)`), or the underlying `FontFamily` enum.
-- **SwiftUI:** the semantic `TextStyle` case used through `AppText(_, style:)`
-  in `TextStyles.swift`; fall back to the shared `SwiftUI.Font` statics
-  (`.systemRegular16`, `.nissanRegular16`, etc.) only when a semantic style does
-  not fit.
+Map Figma typography to existing definitions:
+- UIKit: `UIFont.<brandWeight>Font(ofSize:)` or the underlying `FontFamily` enum.
+- SwiftUI: semantic `TextStyle` through `AppText(_, style:)`; use shared Font
+  statics only when no semantic style fits.
 
-Check font family, weight, size, line height, and letter spacing where available,
-and match the closest existing brand/weight helper. Do not introduce a new font
+Check font family, weight, size, line height, and letter spacing where available.
+Also check Dynamic Type/accessibility implications. Do not introduce a new font
 definition solely from Figma output.
 
 ### Components
 Map Figma components and variants to existing:
-- Shared SwiftUI components in
-  `NC/NCI/Commons/Component/SwiftUIComponents/` (`AppText`, `AppAlertView`,
-  `AppLoader`, `BulletText`, `CircularProgressIndicator`, `InfoStateView`).
-- Shared UIKit components in `NC/NCI/Commons/` and `NC/NCI/Commons/Component/`
-  (`CheckboxButton`, `NCISwitch`, `CustomRadiusButton`, `CustomSwitchView`,
-  `ProgressBar`, `NCRangeSlider`, `NCCharts`, `NCErrorView`, `ShimmerView`,
-  `BannerMessageView`).
+- Shared SwiftUI components in `NC/NCI/Commons/Component/SwiftUIComponents/`.
+- Shared UIKit components in `NC/NCI/Commons/` and `NC/NCI/Commons/Component/`.
 - Existing feature-local custom components under the relevant feature folder.
 
 Check the repository before deciding that a component is missing.
 
-### Layout
+### Layout and interaction
 Translate Figma layout intent into project concepts without producing final code.
 Capture:
 - Parent/child hierarchy
@@ -263,23 +294,53 @@ Capture:
 - Borders
 - Shadows/elevation
 - Scrolling behavior
+- Safe-area behavior
 - Responsive/constraint behavior
+- Navigation and interaction behavior
+- Loading, empty, error, disabled, and selected states
+
+Validate these decisions against applicable Apple HIG patterns rather than
+blindly reproducing custom Figma behavior.
+
+### Accessibility
+During design mapping, identify applicable accessibility considerations:
+- Dynamic Type and text scaling
+- Sufficient contrast
+- VoiceOver labels/hints and meaningful element order
+- Non-color ways to communicate state
+- Adequate interaction targets
+- Reduce Motion / animation considerations when relevant
+- Accessibility for custom controls and images
+
+Record unresolved accessibility issues as Gaps for implementation.
 
 ### Localization
 For visible copy, map text to the correct feature localization table and key:
 - Source tables: `NC/NCI/Resources/Localization/en.lproj/*.strings`.
-- Access via `L10n.<Table>.<key>` (SwiftGen `Localized.swift`).
-- Known tables: `Account`, `AddVehicle`, `Assistance`, `Battery`, `Brand`,
+- Access via `L10n.<Table>.<key>` (`Localized.swift`).
+- Known tables include `Account`, `AddVehicle`, `Assistance`, `Battery`, `Brand`,
   `ChargingHistory`, `Dashboard`, `HealthStatus`, `History`, `Hvac`,
   `JourneyDiary`, `Localizable`, `Navigation`, `NissanStore`, `Notification`,
   `Onboarding`, `Profile`, `Program`, `Restriction`, `VehicleRecovery`.
 
 Do not assume Figma copy is already the exact production localization key.
-Record missing localization keys as Gaps.
+Record missing localization keys as Gaps. Consider text expansion and RTL where
+applicable to the supported product locales.
+
+### App Review design requirements
+Check App Review Guidelines only for requirements relevant to the analyzed UI or
+feature, especially the Design section. Examples include minimum-functionality,
+copycat/impersonation, and other design-related requirements when they are actually
+applicable.
+
+Do not claim that a design violates App Review Guidelines without identifying the
+specific applicable requirement. If no relevant App Review concern is found, state
+that no specific design concern was identified rather than performing a generic
+full-policy audit.
 
 ### Platform boundaries
-App-layer tokens/components (`Asset`, `FontFamily`, `TextStyle`, `AppText`,
-`L10n`) belong to the NCI app target. They are NOT available to the watch app
+App-layer tokens/components (`Asset`, `FontFamily`, `TextStyle`, `AppText`, `L10n`)
+belong to the NCI app target. They are NOT available to the watch app
 (`NC/NCIWatch Watch App`), widgets (`NC/NCIWidget`, `NC/NCWidget`), or intents.
 If the target is watch/widget/intent, check that target's own local tokens/assets
 before mapping, and record app-only tokens as Gaps for that target.
@@ -287,8 +348,6 @@ before mapping, and record app-only tokens as Gaps for that target.
 ## Expected output
 Return a **design-mapping note in chat** with enough detail for the implementation
 stage to work without re-reading the whole Figma design.
-
-Recommended structure:
 
 ### Figma target
 - File key
@@ -299,6 +358,13 @@ Recommended structure:
 - Screen hierarchy
 - Important child nodes
 - Layout behavior
+- Interaction/state behavior
+
+### Apple iOS considerations
+- Applicable HIG considerations
+- Accessibility considerations
+- App Review Design consideration, only when applicable
+- Any Figma-to-iOS deviations that require a product/design decision
 
 ### Token mapping
 | Figma property | Figma value/variable | Existing NCI token | Status |
@@ -310,11 +376,13 @@ Recommended structure:
 
 ### Typography
 - Figma font/style
-- Existing NCI equivalent (`UIFont.<brandWeight>Font(ofSize:)` or `TextStyle` case)
+- Existing NCI equivalent (`UIFont.<brandWeight>Font(ofSize:)` or `TextStyle`)
+- Dynamic Type/accessibility consideration when applicable
 
 ### Localization
 - Visible copy
 - Existing `L10n.<Table>.<key>`
+- Localization/expansion considerations
 
 ### Assets
 - Asset/node
@@ -332,6 +400,11 @@ Only list genuine gaps, conflicts, or decisions requiring human input.
 - Treat Figma MCP generated React/Tailwind output as a design representation, not
   as final project code.
 - Reuse existing NCI design-system definitions whenever possible.
+- Apply applicable Apple iOS design guidance during analysis, not after UI generation.
+- Do not blindly reproduce a Figma pattern that conflicts with an applicable Apple
+  requirement; document the conflict instead.
+- Do not perform a full App Review policy audit; check only applicable design
+  requirements for the analyzed UI/feature.
 - Never replace a repository lookup with an assumption from the Figma name alone.
 - Keep the analysis focused on the requested node/screen; avoid unnecessary file-wide
   Figma exploration.
@@ -342,54 +415,28 @@ Report that the ticket has no Figma URL. Ask whether to continue without Figma
 rather than inventing a design source.
 
 ### Figma MCP is unavailable
-Report that Figma MCP access is unavailable. Do not claim that the design was inspected
-and do not infer exact visual properties from the ticket description alone.
+Report that Figma MCP access is unavailable. Do not claim that the design was
+inspected and do not infer exact visual properties from the ticket description alone.
 
 ### Invalid or incomplete Figma URL
 Report which required information is missing (`fileKey` and/or `nodeId`) and use a
 known supplied node ID when possible.
 
 ### `get_design_context` is truncated
-Use `get_metadata`, identify relevant child nodes, and fetch smaller design-context
-requests.
+Use `get_metadata`, identify relevant child nodes, and call `get_design_context`
+again for only those child nodes.
 
 ### No matching NCI token/component
-List the design value and the closest repository evidence (file + symbol) under
-**Gaps**. Do not invent a token or implementation.
+Do not invent one. Report the Figma value, the closest existing NCI option if any,
+and the mismatch as a Gap.
 
-### Figma and project tokens differ
-Report both values. Prefer the existing NCI design-system token for eventual iOS
-implementation unless the developer explicitly requests a new token decision. Do
-not silently change the project's design system during this analysis stage.
+### Figma and Apple guidance conflict
+Do not silently change the design. Identify the applicable Apple consideration,
+describe the Figma behavior, and provide the implementation decision needed from
+the product/design owner when the conflict is not resolvable from existing NC/NCI
+conventions.
 
-## Required tools/MCP
-### Figma MCP read operations
-- `get_design_context` — primary design inspection
-- `get_metadata` — hierarchy/node discovery and recovery from large responses
-- `get_screenshot` — visual reference/validation
-- `get_variable_defs` — variables and styles/token inspection
-- `get_code_connect_map` — existing Figma-to-code mapping lookup, when available
-- `get_code_connect_suggestions` — candidate component mappings, when available
-
-### Repository read operations
-Filesystem/read tools to locate existing tokens, components, typography,
-localization, and assets. Primary lookup locations:
-- Colors/images: `NC/NCI/Commons/SwiftGen/Assets.swift`
-- Fonts: `NC/NCI/Commons/SwiftGen/Fonts.swift`, `NC/NCI/Extensions/UIFonts+NCI.swift`
-- SwiftUI typography: `NC/NCI/Commons/Component/SwiftUIComponents/TextStyles.swift`
-- Localization: `NC/NCI/Commons/SwiftGen/Localized.swift`,
-  `NC/NCI/Resources/Localization/en.lproj/*.strings`
-- Components: `NC/NCI/Commons/`, `NC/NCI/Commons/Component/`
-
-Do not require write-capable Figma tools for this skill.
-
-## Permission gates
-None (read-only).
-
-## Source alignment
-This workflow follows the Figma MCP server guidance for extracting `fileKey`/`nodeId`,
-fetching design context, recovering through metadata, capturing screenshots, inspecting
-variables, and reusing project design-system conventions. Figma MCP guidance also
-emphasizes that generated framework-specific output is a starting representation rather
-than final project code. The token/component/typography/localization references are
-grounded in the OneId_EVO (NC/NCI) repository as of this skill's last update.
+### App Review applicability is unclear
+Do not speculate. State that no specific App Review design requirement could be
+confirmed from the available information and leave broader review/compliance to the
+appropriate validation stage.
