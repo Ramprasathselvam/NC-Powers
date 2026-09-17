@@ -60,6 +60,30 @@ Reference module: `NC/NCI/Onboarding/Authentication/`:
 When classifying, identify each role by file and report the wiring the factory
 performs (e.g. `interactor.output = presenter`, `presenter.view = view`).
 
+### SwiftUI islands (SwiftUI embedded in the UIKit app)
+The app is primarily UIKit VIPER, but SwiftUI is used for specific screens and
+components, embedded as "islands" hosted from UIKit. Report this when a change is
+SwiftUI (or should be):
+- **Hosting:** SwiftUI views are presented from a UIKit view controller via
+  `UIHostingController(rootView:)` (e.g.
+  `User Profile/User Interface/UserAccountTableViewController+OneID.swift`).
+  Report the hosting call site as the integration point.
+- **Island layout:** a feature can mix VIPER with SwiftUI — `Boundaries/` /
+  `Interactor/` / `Presenter/` alongside `View/` (SwiftUI `View` structs) and
+  `ViewModel/` (`ObservableObject` view models). Reference island:
+  `NC/NCI/User Profile/SoftwareUpdate/`.
+- **Standalone SwiftUI views:** e.g. `Onboarding/*/OneID/OneIDWebView.swift`,
+  `OneIDDeleteView.swift`.
+- **Shared SwiftUI building blocks:** `NC/NCI/Commons/Component/SwiftUIComponents/`
+  (`AppText`/`TextStyles`, `AppAlertView`, `InfoStateView`,
+  `CircularProgressIndicator`, `BulletText`, `NavigationRouter`) and
+  `NC/NCI/Commons/SwiftUI/`.
+
+When the target is SwiftUI, classify roles as View / ViewModel(`ObservableObject`)
+and report the `UIHostingController` boundary and any VIPER
+`Interactor`/`Presenter` the ViewModel talks to. When it is UIKit, use the
+View(Controller)/Presenter/Interactor classification above.
+
 ### AdapterCenter — shared runtime state (not a per-feature adapter)
 `AdapterCenter.shared` is a global singleton holding cross-feature vehicle/session
 state (e.g. `vin`, `healthStatus`, `userProfileDetails`, and vehicle-capability
@@ -125,8 +149,12 @@ app-layer `Asset`/`FontFamily`/`TextStyle`/`L10n`. If the change targets one of
 these, report that boundary.
 
 ## Workflow
-1. Locate the feature files and classify roles: View(Controller) / Presenter /
-   Interactor / boundary protocols / `<Feature>Factory`. Report the factory wiring.
+1. Locate the feature files and determine whether the area is UIKit VIPER or a
+   SwiftUI island (or a mix). Classify roles accordingly:
+   - UIKit → View(Controller) / Presenter / Interactor / boundary protocols /
+     `<Feature>Factory`; report the factory wiring.
+   - SwiftUI → `View` structs / `ViewModel` (`ObservableObject`) + the
+     `UIHostingController` boundary and any VIPER Interactor/Presenter behind it.
 2. Identify the feature's `<Feature>Adapter` and which `AdapterCenter.shared`
    fields it reads/writes.
 3. Identify the navigation entry (`AppRouter.processContext` / `Coordinator` /
@@ -143,7 +171,9 @@ these, report that boundary.
 A **discovery report in chat** with `file:line` references. No files created.
 
 Recommended structure:
-- **Feature module** — files by role + factory wiring
+- **UI kind** — UIKit VIPER, SwiftUI island, or mixed
+- **Feature module** — files by role + factory wiring (or View/ViewModel +
+  `UIHostingController` host for SwiftUI)
 - **Adapters/state** — `<Feature>Adapter` + `AdapterCenter.shared` fields used
 - **Navigation entry** — the concrete hook point
 - **Networking** — which stack + reference files (or N/A)
@@ -173,8 +203,9 @@ None (read-only).
 
 ## Source alignment
 The VIPER-MVP layout (`<Feature>Factory`, split boundary files, `Business Logic`/
-`User Interface`/`<Feature>Adapter` subfolders), `AdapterCenter.shared` shared
-state, `AppRouter`/`Coordinator`/`StoryboardSegue` navigation, the legacy Kamereon
+`User Interface`/`<Feature>Adapter` subfolders), the SwiftUI-island pattern
+(`View`/`ViewModel` hosted via `UIHostingController`, shared `SwiftUIComponents`),
+`AdapterCenter.shared` shared state, `AppRouter`/`Coordinator`/`StoryboardSegue` navigation, the legacy Kamereon
 per-endpoint `Core` stack (PromiseKit + ObjectMapper) vs the OneID callback stack
 gated on `AppConfiguration.isOneIDEligible`, the mixed Swift 4.2/5.0 framework
 targets, and brand/region gating are all grounded in the (NC/NCI)
