@@ -2,7 +2,7 @@
 name: ios-architecture
 description: >-
   Discover where a change belongs and how surrounding code works in the
-  OneId_EVO (NC/NCI) app — VIPER-MVP module, factory, per-feature adapter,
+  (NC/NCI) app — VIPER-MVP module, factory, per-feature adapter,
   AdapterCenter shared state, navigation entry, and which networking stack a Kit
   uses — before implementing. Read-only.
 activation:
@@ -21,7 +21,7 @@ gates: []
 # ios-architecture
 
 ## Purpose
-Locate the correct place for a change in the OneId_EVO (NC/NCI) codebase and
+Locate the correct place for a change in the (NC/NCI) codebase and
 surface the exact patterns to mirror: the VIPER-MVP module + boundary protocols +
 `<Feature>Factory`, the per-feature `<Feature>Adapter` and any `AdapterCenter`
 shared state it reads, the navigation entry point, and — for API work — which
@@ -177,5 +177,5 @@ The VIPER-MVP layout (`<Feature>Factory`, split boundary files, `Business Logic`
 state, `AppRouter`/`Coordinator`/`StoryboardSegue` navigation, the legacy Kamereon
 per-endpoint `Core` stack (PromiseKit + ObjectMapper) vs the OneID callback stack
 gated on `AppConfiguration.isOneIDEligible`, the mixed Swift 4.2/5.0 framework
-targets, and brand/region gating are all grounded in the OneId_EVO (NC/NCI)
+targets, and brand/region gating are all grounded in the (NC/NCI)
 repository as of this skill's last update.
